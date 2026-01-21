@@ -147,13 +147,13 @@ function setup() {
   music.setVolume(music_sound);
 
   //socket client connection...keep it running
-  socket = io('http://localhost:5050', {
-    transports: ['websocket', 'polling'],
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    timeout: 20000
-  });
+  // socket = io('http://localhost:5050', {
+  //   transports: ['websocket', 'polling'],
+  //   reconnection: true,
+  //   reconnectionAttempts: Infinity,
+  //   reconnectionDelay: 1000,
+  //   timeout: 20000
+  // });
 
   //check you're connected to server
   socket.on('connect', () => {
