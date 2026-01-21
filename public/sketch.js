@@ -155,6 +155,8 @@ function setup() {
   //   timeout: 20000
   // });
 
+  let socket = io();
+
   //check you're connected to server
   socket.on('connect', () => {
     console.log("Connected to server:", socket.id);
