@@ -155,7 +155,7 @@ function setup() {
   //   timeout: 20000
   // });
 
-  let socket = io();
+  socket = io();
 
   //check you're connected to server
   socket.on('connect', () => {
