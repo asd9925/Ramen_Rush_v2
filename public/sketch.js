@@ -78,7 +78,7 @@ let potClicks = 0;
 let panClicks = 0;
 
 //welcome screen
-let screen = 1;
+let screen = 0;
 
 //sound
 let music;
@@ -99,6 +99,9 @@ let inputState = 'enterName'; //then waiting for other player, matched, countdow
 let countdown = 0;
 let countdownActive = false;
 let countdownStart = 0; //make countdowns completely synced 
+
+//two player or solo mode
+let gameMode = 'twoPlayer'; //default
 
 //can't move ingredients from pot/pan until cooked (after 2 seconds)
 let ramenLocked;
@@ -173,6 +176,52 @@ function setup() {
   submitButton.style('background-color', '#ffcb9a');
   submitButton.style('cursor', 'pointer');
   submitButton.hide();
+  //solo button
+  soloButton = createButton('Solo');
+  soloButton.position(width / 2 - 180, height / 1.8);
+  soloButton.style('background-color', '#ffcb9a');
+  soloButton.style('cursor', 'pointer');
+  soloButton.style('font-size', '21px');
+  soloButton.size(130,60);
+  soloButton.hide();
+  //two player button
+  twoButton = createButton('Two-player');
+  twoButton.position(width / 2 + 80, height / 1.8);
+  twoButton.style('background-color', '#ffcb9a');
+  twoButton.style('cursor', 'pointer');
+  twoButton.style('font-size', '21px');
+  twoButton.size(130,60);
+  twoButton.hide();
+  //play button for solo mode
+  playButton = createButton('Play');
+  playButton.position(width / 2 -50, height / 1.8);
+  playButton.style('background-color', '#ffcb9a');
+  playButton.style('cursor', 'pointer');
+  playButton.style('font-size', '21px');
+  playButton.size(130,60);
+  playButton.hide();
+
+  //listener for clicking two player
+  twoButton.mousePressed(() =>{
+    soloButton.hide();
+    twoButton.hide();
+    gameMode = 'twoPlayer';
+    screen = 1; //move to two player screen
+  })
+
+  //listener for clicking solo
+  soloButton.mousePressed(() => {
+    soloButton.hide();
+    twoButton.hide();
+    gameMode = 'solo';
+    screen = solo; //move to solo screen
+  })
+
+  //listener for clicking play
+  playButton.mousePressed(() =>{
+    playButton.hide();
+    screen = 2;
+  })
 
   //socket listener for submitting name
   submitButton.mousePressed(() => {
@@ -354,12 +403,16 @@ function kitchenSprites() {
 }
 
 function draw() {
-  if (screen === 1) {
+  if (screen === 0){
+    screen0();
+  }
+  else if (screen === 1) {
     cuttingBoardImg.visible = false;
     tofu.visible = false;
     egg.visible = false;
 
     screen1();
+
     // countdown while in screen1 after matched
     if (inputState === 'matched' && countdownActive) {
       if (frameCount - countdownStart >= 60) {
@@ -372,7 +425,9 @@ function draw() {
         }
       }
     }
-  } else if (screen === 2) {
+  } else if (screen === solo){
+    solo();
+  }else if (screen === 2) {
     cuttingBoardImg.visible = true;
     tofu.visible = true;
     egg.visible = true;
@@ -414,7 +469,8 @@ function screen2() {
     image(recipeSteps[currentStep], 10, width * 0.01, width * 0.38, height * 0.44);
   }
 
-  //opponent name at top with current step, different sized rect based on name size
+  if (gameMode === 'twoPlayer'){
+  //opponent name at top with current step, different sized rect based on name size IF TWO PLAYER
   push();
   textSize(24);
   let fullText = opponentName + ": Step " + currentOpponentStep;
@@ -426,6 +482,7 @@ function screen2() {
   fill("black");
   text(fullText, width / 2, height * 0.1);
   pop();
+  }
 
   //go to step 2 when water is added and burners are on
   if (addWaterPot && topBurnerOn && bottomBurnerOn && currentStep === 0) {
@@ -865,6 +922,8 @@ function screen2() {
     //tell server someone completed ramen
     socket.emit("ramenComplete");
   }
+
+  if (gameMode === 'twoPlayer'){
   //display winning/losing text
   if (gameWon) {
     textAlign(CENTER);
@@ -878,6 +937,16 @@ function screen2() {
     fill('black');
     text('YOU LOST!', width / 2, height / 3 - 80);
   }
+  //only show one message if in solo mode
+}else if (gameMode === 'solo'){
+   if (ramenInBowl && scallionsInBowl && eggInBowl && tofuInBowl && cookedEgg && cutScallions && cookedRamen && cookedTofu) {
+      mainTimeStarted = false;
+      textAlign(CENTER);
+      textSize(50);
+      fill('black');
+      text('BOWL COMPLETE!', width/2, height/3-80);
+   }
+}
 }
 
 function mousePressed() {
@@ -949,7 +1018,48 @@ function mousePressed() {
   }
 }
 
-//Welcome screen
+//Decide if solo or multiplayer
+function screen0(){
+  background(255, 173, 173);
+  textAlign(CENTER);
+  imageMode(CENTER);
+
+  image(titleImg, width / 1.8, height / 30, width * 0.75, height * 0.55);
+  //noodles/chopsticks
+  image(chopsticks, width / 1.2, height / 1.6, width / 4.5, height / 1.);
+
+  push();
+  textSize(22);
+  fill("black");
+  text("Created by Anna Deckoff", width / 2, height / 2.3);
+  pop();
+
+  soloButton.show();
+  twoButton.show();
+}
+
+//Welcome screen for solo
+function solo(){
+  background(255, 173, 173);
+  textAlign(CENTER);
+  imageMode(CENTER);
+  image(titleImg, width / 1.8, height / 30, width * 0.75, height * 0.55);
+
+  //noodles/chopsticks
+  image(chopsticks, width / 1.2, height / 1.6, width / 4.5, height / 1.);
+
+  //instructions
+  push();
+  textSize(22);
+  textAlign(CENTER);
+  fill("black");
+  text("How fast can you make a bowl of ramen?", width / 2, height / 2.3);
+  pop();
+
+  playButton.show();
+}
+
+//Welcome screen for two player
 function screen1() {
   input1.show();
   background(255, 173, 173);
