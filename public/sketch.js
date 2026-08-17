@@ -110,6 +110,11 @@ let eggLocked;
 
 completedRamen = false;
 
+//resizing
+const GAME_W = 1280;
+const GAME_H = 720;
+let gamecontainer;
+
 function preload() {
   panImg = loadImage("panfinal2.png");
   music = loadSound("background.mp3");
@@ -139,10 +144,21 @@ function preload() {
   timeFont = loadFont("Technology-Bold.ttf");
   titleImg = loadImage("title.png");
   chopsticks = loadImage("noodlesfinal.png");
+  subtitle = loadImage("cozygame.png");
+  howfast = loadImage("howfast.png");
+  thefastest = loadImage("thefastest2.png");
+  bowlcomplete = loadImage("bowlcomplete.png");
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  gameContainer = createDiv('');
+  gameContainer.id('game-container');
+
+  createCanvas(GAME_W, GAME_H).parent(gameContainer);
+  scaleGameContainer();
+
+
+  // createCanvas(windowWidth, windowHeight);
   x = width / 2;
   y = height / 2;
   //start music 
@@ -167,35 +183,43 @@ function setup() {
 
   //inputs of usernames
   input1 = createInput('');
+  input1.parent(gameContainer);
   input1.position(width / 2, height / 2.4);
   input1.attribute('placeholder', 'Enter your name');
   input1.hide();
   //submit button
   submitButton = createButton('Submit');
+  submitButton.parent(gameContainer);
   submitButton.position(width / 2 + 120, height / 2.4);
   submitButton.style('background-color', '#ffcb9a');
   submitButton.style('cursor', 'pointer');
   submitButton.hide();
   //solo button
   soloButton = createButton('Solo');
-  soloButton.position(width / 2 - 180, height / 1.8);
+  soloButton.parent(gameContainer);
+  soloButton.position(width / 2 - 180, height / 1.9);
   soloButton.style('background-color', '#ffcb9a');
+  soloButton.style('border-radius', '10px');
   soloButton.style('cursor', 'pointer');
   soloButton.style('font-size', '21px');
   soloButton.size(130,60);
   soloButton.hide();
   //two player button
   twoButton = createButton('Two-player');
-  twoButton.position(width / 2 + 80, height / 1.8);
+  twoButton.parent(gameContainer);
+  twoButton.position(width / 2 + 80, height / 1.9);
   twoButton.style('background-color', '#ffcb9a');
+  twoButton.style('border-radius', '10px');
   twoButton.style('cursor', 'pointer');
   twoButton.style('font-size', '21px');
   twoButton.size(130,60);
   twoButton.hide();
   //play button for solo mode
   playButton = createButton('Play');
-  playButton.position(width / 2 -50, height / 1.8);
+  playButton.parent(gameContainer);
+  playButton.position(width / 2 -50, height / 1.9);
   playButton.style('background-color', '#ffcb9a');
+  playButton.style('border-radius', '10px');
   playButton.style('cursor', 'pointer');
   playButton.style('font-size', '21px');
   playButton.size(130,60);
@@ -945,6 +969,7 @@ function screen2() {
       textSize(50);
       fill('black');
       text('BOWL COMPLETE!', width/2, height/3-80);
+      // image(bowlcomplete, width/2, height/3-80, width * 0.2, height * 0.1);
    }
 }
 }
@@ -1025,14 +1050,15 @@ function screen0(){
   imageMode(CENTER);
 
   image(titleImg, width / 1.8, height / 30, width * 0.75, height * 0.55);
+  image(subtitle, width / 2, height / 2.3, width * 0.2, height * 0.08);
   //noodles/chopsticks
   image(chopsticks, width / 1.2, height / 1.6, width / 4.5, height / 1.);
 
-  push();
-  textSize(22);
-  fill("black");
-  text("Created by Anna Deckoff", width / 2, height / 2.3);
-  pop();
+  // push();
+  // textSize(22);
+  // fill("black");
+  // text("A cozy cooking game", width / 2, height / 2.3);
+  // pop();
 
   soloButton.show();
   twoButton.show();
@@ -1048,13 +1074,15 @@ function solo(){
   //noodles/chopsticks
   image(chopsticks, width / 1.2, height / 1.6, width / 4.5, height / 1.);
 
+  image(howfast, width/2, height/2.3, width * 0.4, height * 0.08)
+
   //instructions
-  push();
-  textSize(22);
-  textAlign(CENTER);
-  fill("black");
-  text("How fast can you make a bowl of ramen?", width / 2, height / 2.3);
-  pop();
+  // push();
+  // textSize(22);
+  // textAlign(CENTER);
+  // fill("black");
+  // text("How fast can you make a bowl of ramen?", width / 2, height / 2.3);
+  // pop();
 
   playButton.show();
 }
@@ -1071,11 +1099,12 @@ function screen1() {
   image(chopsticks, width / 1.2, height / 1.6, width / 4.5, height / 1.);
 
   //instructions
-  push();
-  textSize(22);
-  fill("black");
-  text("Who can make a bowl of ramen the fastest?", width / 2, height / 2.3);
-  pop();
+  // push();
+  // textSize(22);
+  // fill("black");
+  // text("Who can make a bowl of ramen the fastest?", width / 2, height / 2.3);
+  // pop();
+  image(thefastest, width/2, height/2.3, width * 0.4, height * 0.05);
 
   //player names text input
   push();
@@ -1118,6 +1147,14 @@ function mouseReleased() {
 
 //accomodate other screen sizes
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  kitchenSprites();
+  // resizeCanvas(windowWidth, windowHeight);
+  // kitchenSprites();
+  scaleGameContainer();
+}
+
+function scaleGameContainer() {
+  let scale = Math.min(windowWidth / GAME_W, windowHeight / GAME_H);
+  gameContainer.style('width', GAME_W + 'px');
+  gameContainer.style('height', GAME_H + 'px');
+  gameContainer.style('transform', `scale(${scale})`);
 }
